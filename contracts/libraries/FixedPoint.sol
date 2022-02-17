@@ -47,17 +47,21 @@ library FixedPoint {
     // multiply a UQ112x112 by a uint, returning a UQ144x112
     // reverts on overflow
     function mul(uq112x112 memory self, uint256 y) internal pure returns (uq144x112 memory) {
-        uint256 z = 0;
-        require(y == 0 || (z = self._x * y) / y == self._x, 'FixedPoint::mul: overflow');
-        return uq144x112(z);
+        unchecked {
+            uint256 z = 0;
+            require(y == 0 || (z = self._x * y) / y == self._x, 'FixedPoint::mul: overflow');
+            return uq144x112(z);
+        }
     }
 
     // multiply a UQ112x112 by an int and decode, returning an int
     // reverts on overflow
     function muli(uq112x112 memory self, int256 y) internal pure returns (int256) {
-        uint256 z = FullMath.mulDiv(self._x, uint256(y < 0 ? -y : y), Q112);
-        require(z < 2**255, 'FixedPoint::muli: overflow');
-        return y < 0 ? -int256(z) : int256(z);
+        unchecked {
+            uint256 z = FullMath.mulDiv(self._x, uint256(y < 0 ? -y : y), Q112);
+            require(z < 2**255, 'FixedPoint::muli: overflow');
+            return y < 0 ? -int256(z) : int256(z);
+        }
     }
 
     // multiply a UQ112x112 by a UQ112x112, returning a UQ112x112
